@@ -1,6 +1,6 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGQaX3C0PAszr7Xqtvn8Dbpm-JcWsBJZkxCxr3HA5-lk55bYmJe6cTWgyD_c_EVNp8/exec"; // <--- PASTIIN URL BARU
-const KANTOR_LAT = -6.6123; 
-const KANTOR_LNG = 106.2594;
+const KANTOR_LAT = -6.628209010488044; 
+const KANTOR_LNG = 106.29402842818563;
 const MAX_JARAK = 50; 
 
 const videoEl = document.getElementById('camera');
