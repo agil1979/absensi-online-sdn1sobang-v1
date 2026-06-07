@@ -1,23 +1,32 @@
-// ⚠️ GANTI DENGAN LINK GOOGLE APPS SCRIPT ANDA
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzKS-Krc0WqgE2zOlPfd772Sa-QNhXdWQWoEqtj-J11QQox0N_0AqXX4HV5tU6fzsOK/exec";
-const KANTOR_LAT = -6.628209010488044;   // Ganti koordinat kantor
+const KANTOR_LAT = -6.628209010488044; 
 const KANTOR_LNG = 106.29402842818563;
-const MAX_JARAK = 50;          // Radius dalam meter
+const MAX_JARAK = 50; 
 
 const videoEl = document.getElementById('camera');
 const canvasEl = document.getElementById('canvas');
 const btnAbsen = document.getElementById('btn-absen');
 const statusEl = document.getElementById('status');
-const previewEl = document.getElementById('preview');
 
 let userLat = 0, userLng = 0;
 
-// Aktifkan Kamera
-navigator.mediaDevices.getUserMedia({ video: true })
-    .then(stream => videoEl.srcObject = stream)
-    .catch(err => statusEl.innerText = "Kamera Gagal: " + err.message);
+// === 1. FUNGSI AKTIFKAN KAMERA ===
+async function aktifkanKamera() {
+    statusEl.innerText = "Meminta izin kamera...";
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: "user" }, 
+            audio: false 
+        });
+        videoEl.srcObject = stream;
+        statusEl.innerText = "Kamera aktif. Mengecek lokasi...";
+        cekLokasi(); // Jalankan cek lokasi setelah kamera aktif
+    } catch (err) {
+        statusEl.innerHTML = "<span style='color:red'>Gagal Kamera: " + err.message + "<br>Pastikan Izin Kamera Diaktifkan!</span>";
+    }
+}
 
-// Hitung Jarak
+// === 2. FUNGSI HITUNG JARAK ===
 function hitungJarak(lat1, lon1, lat2, lon2) {
     const R = 6371000;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -28,70 +37,62 @@ function hitungJarak(lat1, lon1, lat2, lon2) {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-// Cek Lokasi
+// === 3. FUNGSI CEK LOKASI ===
 function cekLokasi() {
-    navigator.geolocation.getCurrentPosition(pos => {
+    if (!navigator.geolocation) {
+        statusEl.innerText = "Browser tidak mendukung GPS";
+        return;
+    }
+
+    // Gunakan watchPosition agar lebih responsif daripada getCurrentPosition
+    navigator.geolocation.watchPosition(pos => {
         userLat = pos.coords.latitude;
         userLng = pos.coords.longitude;
         const jarak = hitungJarak(userLat, userLng, KANTOR_LAT, KANTOR_LNG);
         
         if (jarak <= MAX_JARAK) {
-            statusEl.innerHTML = "<span style='color:green'>✅ LOKASI TERVERIFIKASI</span>";
+            statusEl.innerHTML = "<span style='color:green'>✅ LOKASI TERVERIFIKASI ("+Math.round(jarak)+"m)</span>";
             btnAbsen.disabled = false;
             btnAbsen.style.background = "#28a745";
         } else {
-            statusEl.innerHTML = "<span style='color:red'>❌ LUAR RADIUS (" + Math.round(jarak) + "m)</span>";
+            statusEl.innerHTML = "<span style='color:red'>❌ DI LUAR RADIUS (" + Math.round(jarak) + "m)</span>";
             btnAbsen.disabled = true;
             btnAbsen.style.background = "#dc3545";
         }
     }, err => {
-        statusEl.innerText = "GPS: " + err.message;
+        if(err.code === 1) {
+            statusEl.innerHTML = "<span style='color:red'>Izin Lokasi Ditolak. Tolong izinkan di pengaturan browser!</span>";
+        } else {
+            statusEl.innerText = "Mencari sinyal GPS...";
+        }
     }, { enableHighAccuracy: true });
 }
 
-// Proses Absen
+// === 4. PROSES KLIK ABSEN ===
 btnAbsen.addEventListener('click', function() {
     const nama = prompt("Masukkan Nama Lengkap:");
     if (!nama) return;
     
     btnAbsen.disabled = true;
     btnAbsen.innerText = "Mengirim...";
-    btnAbsen.style.background = "#6c757d";
     
-    // Ambil foto
     canvasEl.width = 320;
     canvasEl.height = 240;
     canvasEl.getContext('2d').drawImage(videoEl, 0, 0, 320, 240);
     const foto = canvasEl.toDataURL('image/jpeg', 0.5);
     
-    // Tampilkan preview
-    previewEl.src = foto;
-    previewEl.style.display = "block";
-    videoEl.style.display = "none";
-    
-    // Kirim via JSONP
     const dataStr = encodeURIComponent(JSON.stringify({
-        nama: nama,
-        lat: userLat,
-        lng: userLng,
-        photo: foto
+        nama: nama, lat: userLat, lng: userLng, photo: foto
     }));
     
     const tag = document.createElement('script');
     tag.src = SCRIPT_URL + '?data=' + dataStr + '&callback=cbSukses';
     window.cbSukses = function(res) {
-        if (res.status === 'success') {
-            alert("✅ ABSENSI TERSIMPAN!");
-            location.reload();
-        } else {
-            alert("Gagal: " + res.msg);
-            btnAbsen.disabled = false;
-            btnAbsen.innerText = "Coba Lagi";
-        }
+        alert("✅ ABSENSI TERSIMPAN!");
+        location.reload();
     };
     document.body.appendChild(tag);
 });
 
-// Mulai
-window.onload = function() {
-    setInterval(cekLokasi, 3000);
+// Jalankan Kamera saat halaman selesai dimuat
+window.onload = aktifkanKamera;
