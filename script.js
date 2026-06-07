@@ -1,4 +1,4 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx6-MDUaYX96Miowpkt3qg4dcK9ItQh0sAoekMfWyzVjEuqIDyFfEMyNg4SjnLJBy7i/exec"; // <--- PASTIIN URL BARU
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxopckGBuZ3vNlcO2MA3Xf8pGorvV7tD0ijwJdOTuyhfiaTrD7d6g8NCVZ0x75ERZGP/exec"; // <--- PASTIIN URL BARU
 const KANTOR_LAT = -6.628209010488044; 
 const KANTOR_LNG = 106.29402842818563;
 const MAX_JARAK = 50; 
