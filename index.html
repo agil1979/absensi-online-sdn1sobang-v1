@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi Online</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        video, img { width: 100%; max-width: 320px; border-radius: 8px; background: #222; }
+        #status { margin: 15px 0; font-weight: bold; font-size: 14px; }
+        button { background: #6c757d; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-size: 16px; cursor: pointer; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>📋 Absensi Online</h2>
+        <video id="camera" autoplay playsinline></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <img id="preview" style="display:none;">
+        <div id="status">Mengecek lokasi...</div>
+        <button id="btn-absen" disabled>Ambil Foto & Absen</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
