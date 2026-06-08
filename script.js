@@ -1,7 +1,7 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxopckGBuZ3vNlcO2MA3Xf8pGorvV7tD0ijwJdOTuyhfiaTrD7d6g8NCVZ0x75ERZGP/exec"; // <--- PASTIIN URL BARU
 const KANTOR_LAT = -6.615583705175903;
 const KANTOR_LNG = 106.30761570252048;
-const MAX_JARAK = 150; 
+const MAX_JARAK = 250; 
 
 const videoEl = document.getElementById('camera');
 const canvasEl = document.getElementById('canvas');
